@@ -1,0 +1,35 @@
+\documentclass{report}
+
+\input{Setup/Preample.tex}
+\input{Setup/Hyphenations.tex}
+\input{Setup/Macros.tex}
+\begin{document}
+%Todos
+\listoftodos
+%frontmatter
+\pagestyle{empty} %disable headers and footers
+\pagenumbering{Roman} %use roman page numbering in the frontmatter
+\input{Sections/AAU/Frontpage.tex}
+\input{Sections/AAU/Colophon.tex}
+\addcontentsline{toc}{chapter}{Abstract} 
+\input{Sections/AAU/Titlepages.tex}
+
+\pdfbookmark[0]{Contents}{label:contents}
+\pagestyle{fancy} %enable headers and footers again
+\tableofcontents
+\input{Sections/AAU/Preface.tex}
+%mainmatter
+\pagenumbering{arabic} %use arabic page numbering in the mainmatter
+
+%Normal Sections
+\input{Sections/Contextual_Analysis/Introduction.tex}
+\input{Sections/Contextual_Analysis/Amputee.tex}
+\input{Sections/Contextual_Analysis/Prostheses.tex}
+\input{Sections/Contextual_Analysis/Mucles.tex}
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography
+\appendix
+
+%appendix below¨
+
+\end{document}
