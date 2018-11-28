@@ -1,0 +1,86 @@
+\discuss{We need to talk about intergration of the muscle section}
+\chapter{Muscles}\label{ch:Beef}
+\section{Control systems}
+Norman S. Nise define a control system in his book Nises' Control System Engineering:
+\begin{displayquote}
+\textit{A control system consist of subsystems and processes assembled for the purpose of obtaining a desired output with desired performance given a specific input}
+\end{displayquote}
+
+\noindent A signal showing that the prostheses first motor should move until that signal stops. this allows the user to determine the specific position of the prostheses. Here the signal is the input and the motor turning is the output or response. 
+\subsection{Using EMG}
+
+\section{Bio mechanics}
+The human autonomy is incredibly advanced. It is able to easily complete intricate tasks without much thought. 
+Take the human Arm. It has 7 DOF and through them is able to pick and place most objects without damaging them, while orienting them any way desired. \cite{Redundan25:online}\\ 
+The limbs can be described simply by addressing it as joints connected by rigid links, moved by the contractions of muscles. These contractions are made by running a current through them. The brain calculates what motions is needed for a given task, and then precisely activates relevant muscles. this allows for precise movements. \\
+This is very similar to a Robotic manipulator with a similar amount of DOF.
+Whenever the human arm make a movement, it does so through the use of muscles. And whenever a muscles is activated(contracting)  a change in currents can be measured, this is done with the use of an EMG (Electromyography). \cite{Electrom76:online}
+
+\subsection{Electromyography}
+Electromyography is a study of muscles electric activity \cite{Nerveled75:online}.
+this is done by placing conductive pads or needles on or into the muscle in question. Then whenever the muscle contracts it will register as an electrical signal
+\subsection{muscles around shoulder}
+basically: Pectoralis major(breast muscle) and Trapezius (either upper(neck) or middle (on top of shoulder, and upper back)) -- \discuss{ needs pic... but cant find a good one that's not copyright...:'( }
+
+\section{Bio mechanics} \discuss{maybe move this into the intro for the "end user(amputee)" chapter?}
+The human autonomy is advanced. It is able to easily complete intricate tasks without much thought. 
+Take the human Arm. It has 7 DOF and through them is able to pick and place most objects without damaging them, while orienting them any way desired \cite{Redundan25:online}.\\ 
+A simplified way to describe the limbs can be by addressing it as joints connected by rigid links, moved by the contractions of muscles. These contractions are made by running a current through them. The brain calculates what motions is needed for a given task, and then precisely activates relevant muscles. this allows for precise movements.\\
+This is very similar to a Robotic manipulator with a similar amount of DOF.
+Whenever the human arm make a movement, it does so through the use of muscles. And whenever a muscles is activated(contracting)  a change in currents can be measured, this is done with the use of an EMG (Electromyography). \cite{Electrom76:online} so trying to replace the human arm is incredibly complicated, as such the focus is often on trying to mitigate some of the inconveniences faced by the \textbf{\textit{subject}})
+
+\subsection*{Electromyography}
+Electromyography is a study of muscles electric activity \cite{Nerveled75:online}.
+this is done by placing conductive pads or needles on or into the muscle in question. Then whenever the muscle contracts it will register as an electrical signal, this is normally used in the medical community, for more see: \ref{sEMG}.
+\section*{Safety measures}
+When ever designing a control system it is important to keep the users safety ibn mind. The robotic prostheses is a collaborative robot by design. These robots does not require safety barriers since they have to work up close with humans. Other collaborative robots on the marked uses sensors on the joint to insure the robot arm does what is it supposed to do. By measuring the torque, momentum and power you can set a limit for how much the robot is able to use in order to get to its final position. \cite{URsafety}\\ 
+
+Such a system for detection is a clear requirement for this project and should be able to insure the safety of the end user.\todo{rewrite -exiting limits and is it a co-bot.}
+
+
+Before the link velocities can be computed torque has to be computed. The group has decided to use Lagrange equations for torque to compute it\todo{Make a whole section of lagrange}:\\
+
+\begin{align*}
+    Torque\ 1\ (\tau_1):&& \dfrac{d}{dt}\cdot\dfrac{\delta L_3}{\delta\dot{\theta_1}}-\dfrac{\delta L_3}{\delta\theta_1}&&=&&-4.8667Nm\\
+    Torque\ 2\ (\tau_2):&& \dfrac{d}{dt}\cdot\dfrac{\delta L_3}{\delta \dot{\theta_2}}-\dfrac{\delta L_3}{\delta\theta_2}&&=&& 1.757Nm\\
+    Torque\ 3\ (\tau_3):&&\dfrac{d}{dt}\cdot\dfrac{\delta L_3}{\delta \dot{\theta_3}}-\dfrac{\delta L_3}{\delta\theta_3}&&=&&-1.663Nm
+\end{align*}\\
+
+
+with torque
+\begin{align*}
+\omega_1=0&&,&&
+    V_1&&=&& &&&&
+\left[\begin{matrix}
+    0\\
+    0\\
+    0
+\end{matrix}\right]&&,&&V_C_1&&=&&0-4.866\cdot Z\underline{X}S_C_1&&=&&\left[\begin{matrix}
+    144.9\\
+    -89.4\\
+    0
+\end{matrix}\right]\\
+\omega_2=-169&&,&&
+V_2&&=&&0+\tau_1\cdot Z\underline{X}S_1&&=&&
+\left[\begin{matrix}
+    289\\
+    -178\\
+    0
+\end{matrix}\right]&&,&& V_C_2&&=&&V_2+\tau_2\cdot Z\underline{X}S_C_2&&=&&
+\left[\begin{matrix}
+    126\\
+    -260\\
+    0
+\end{matrix}\right]\\
+\omega_3=87&&,&&
+V_3&&=&&V_2+\tau_2\cdot Z\underline{X}S_2&&=&&
+\left[\begin{matrix}
+    -36\\
+    -350\\
+    0
+\end{matrix}\right]&&,&& V_P&&=&&V_3&&=&&\left[\begin{matrix}
+    -36\\
+    -350\\
+    0
+\end{matrix}\right]
+\end{align*}

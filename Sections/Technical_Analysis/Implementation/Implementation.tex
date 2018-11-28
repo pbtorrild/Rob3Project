@@ -1,0 +1,92 @@
+\chapter{Implementation}\label{Implementation}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{Figures/Technical_figures/Smallerflowchart.pdf}
+    \caption{Flowchart of the code used in this project}
+    \label{fig:my_label}
+\end{figure}
+
+\section{SW implementation}
+\subsubsection{ MotorSwitch }
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/Motor_select_flow.JPG}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+As shown below the code of switching the motors is presented. This code is a function implemented to control the signals of the accelerometer. This code makes use of the Z-axis, which is the the axis it is meant to operate in when the user lifts the shoulder.\\
+
+\begin{figure}[H]
+    \centering
+\input{Sections/Technical_Analysis/Implementation/Koder/MotorSw.tex}
+    \caption{Motor Selection, a function written in Arduino code}
+    \label{fig:motorSel}
+\end{figure}
+
+In line 1, an initialisation is commenced with the variables it is wished to use.\\
+At Line 2 and 7, two different if statements is produced. The statements only run if DD is over 800, and if timecheck is false. DD is the accelerometers Z-axis acceleration. Timechek is always false unless a if statement is run as seen in line 4 and 9.\\
+MotorNR has a pre-set of 1, which means it is set to motor 1. When the different if statements is run the motor will switch respectively to the if statements.\\
+Line 12 consists of the current time and the time passed, which has to be more or equal to 3 seconds. timecheck will then be set to false so the if statements can be run again.\\
+The last lines of code is simply to keep the motors from exceeding the number of motors available.
+
+\subsubsection{Angleselect}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/Anlge_select_flow.JPG}
+    \caption{Flowchart of the }
+    \label{fig:my_label}
+\end{figure}
+AngleSelect is a function that increases or decreases the angle of the manipulator. This makes the manipulator more manoeuvrable and easy to steer for the user.\\
+\begin{figure}[H]
+    \centering
+   
+\input{Sections/Technical_Analysis/Implementation/Koder/angelsel.tex}
+
+    \caption{Angle Selection, a function written in Arduino code}
+    \label{fig:AngleSel}
+\end{figure}
+Line one consists of the function and its parameters, where ArrNow is the angle which the manipulator is in, and ArrGoal is which angle is desired of the user.\\
+In line 2 AngleChange is set to 6, which will be used in line 4.\\
+Line 3 is a if statement with two parameters that has to be true, EMG1 must be over or equal to 300 and EMG2 must be lower or equal to 50. When this statement is run a simple equation will begin, which adds ArrNow and the AngleChange together, to move the motor. Line 6 and 7 is simply the same but reversed, so it is possible that the AngleChange can be retracted to move the motor the opposite direction. 
+
+\subsection{CheckSum and checksum verification}
+The Checksum Method is used to ensure the transmitted date hasnot been corrupted or disrupted.
+\paragraph{Checksum:}In the Xbee byte array(24Bytes), in see fig:\ref{fig:XbeeDataFromOldSolution}, the checksum is the last byte in the array.\\
+\begin{figure}[H]
+ \centering 
+    \includegraphics[scale=0.7]{Figures/EMG/XbeeDataArray.png}
+    \caption{How the bytes in the Xbee Byte array, is structured}
+    \label{fig:XbeeDataFromOldSolution}
+\end{figure}
+The bytes excluding the Start delimiter, the Length bytes and the checksum is referred to at the API-specific structure. 
+The Xbee checksum is calculated by adding all the bytes in the API-specific structure, keeping only the 8 lowest bits in the result and subtracting it from 0xFF in hexadecimal(255 in Decimal)\cite{Calculat82:online}.
+\paragraph{Checksum Verification:}
+The sum of the API-specific structure with the transmitted checksum added is 0xFF, if the transmission has not been altered. As such the verification is done by verifying this.
+
+\subsubsection{Code explanation}
+ \input{Sections/Technical_Analysis/Implementation/Koder/Checksum.tex}\label{CheckSumCode}
+\paragraph{Line 2-9}Firstly, the array \textit{disbyte[22]} is made.
+Then the teensy search the data from the Xbee to look for the start delimiter which is 126 or 0x7E and stores the next 23 of bytes.
+\paragraph{Line 10-13:}The int \textit{chkSum} is the sum of the API-specific structure and the checksum byte. It is calculated by adding up the the bytes in the disbyte[22] array excluding the two length bytes from the Xbee.
+
+\paragraph{Line 14-19}The \textit{chkSum} value is tested to ensure it has the value 0xFF. Then sum z, sum y, sum x, sum emg1 and sum emg2 are calculated to be used in the for data.
+
+
+\paragraph{Line 20} Due to that the \textit{chkSum} in some instances can be 255 without being altered. One more check than the check sum done through the \textit{if} statement where if the EMG signal is above 1024 then \textit{chkRec} will not be set true. This will keep the loop running till it as a correct packet.
+\subsubsection{Control algorithm}
+
+
+%\subsubsection{Communication protocol}
+%\input{Sections/Technical_Analysis/Implementation/ComProto.tex}
+%subsection{Communication between Teensy and CrustCrawler}
+\section{HW implementation}
+\subsection*{Wire connection}
+\begin{figure}[H]
+    \centering
+\input{Figures/TikzFigures/layOut/layOut.tex}
+    \caption{Wiring of the Teensy to external components}
+    \label{fig:motorSel}
+\end{figure}
+\subsection*{sEMG placement}
+\input{Figures/TikzFigures/FigcontrolMan.tex}
+

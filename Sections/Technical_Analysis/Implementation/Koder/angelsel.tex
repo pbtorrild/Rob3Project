@@ -1,0 +1,14 @@
+
+
+\begin{lstlisting}[frame=single,language=Arduino]
+void AngleSelect(int32_t &ArrNow, int &MotorNR, int &ArrGoal, int EMG_1, int EMG_2){
+      int AngleChange =6;
+      if (EMG_1>= 300 && EMG_2<= 50){
+          ArrGoal = ArrNow + AngleChange;
+      }
+       else if (EMG_2>=300 && EMG_1<=50){
+          ArrGoal = ArrNow - AngleChange;
+         }
+         else{}
+}
+\end{lstlisting} \label{fig:AS}

@@ -1,0 +1,84 @@
+\chapter{Final problem formulation and requirements}
+\discuss{lets add in delimitation that we will supplement
+this with accelerometers due to us only having 2 EMG sensors available}
+\section{Conclusion on previous chapters}
+People with shoulder disarticulation require a system to assist them in their daily life. A prosthetic system could consists of several types. These options have been investigated and described. The rest of this report will focus on the use of a electric prosthesis using a control system. When choosing said control system several viable options are available, but the most suitable ones with the greatest ease of use for the end user would be using multiple sEMG's sensors as the control input. 
+Taking the safety measures into account the product outline would consist of a robotic tabletop prosthesis connected wireless to the user. The user would control this system with sEMG. 
+\\
+\section{Final problem formulation}
+%%%%%%%%%%%%%%%%%%%%
+The user relies on technology to get general tasks done without help from the outside world.
+Relying on robotic technology and the usage of up to-date control systems these tasks will be normalised and usable to the end-user.\\
+\noindent
+%%%%%%%%%%%%%%%%%%%% 
+\textbf{\textit{\centering How can a person with a shoulder dis-articulation through the use of biological signals control a robotic manipulator.}}\\
+
+To have a better understanding of how to implement such a control method on a robotic manipulator, a series of questions have to be answered. 
+\begin{itemize}
+    \item How to analyse muscular contraction and implementing it in the control of the manipulator.
+    \item How to implement control systems that is accurate and can handle disturbance input.
+    \item How can the manipulator be analysed through a mathematical model.
+    \item How to transmit the data to and from the manipulator.
+\end{itemize}
+
+
+\section{User requirements}
+\textit{description of requirements the end user might have}
+\section{User Requirements}\label{Requirements}
+\begin{table}[H]
+    \centering  
+\begin{tabular}{ |P{1.5cm}||P{3cm}||P{7cm}||P{1.5cm}||P{1.5cm}|  }
+ \hline
+ \multicolumn{5}{|c|}{\textbf{User Requirements}} \\
+ \hline
+ Req. ID & Name & Requirement & Parent & Author \\
+ \hline
+ \userreqid{Drink} & Basic functions of a robot arm & Drink a glass of water through a straw &  --- & --- \\
+ \hline
+ \userreqid{Input device} & Input device & Input device has to cause the least amount of difficulties & --- & --- \\
+ \hline
+ \userreqid{Safety} & Safety & Has to be safe to use for the user & --- & ---  \\
+ \hline
+\end{tabular}
+\caption{Table of User requirements}
+    \label{tab:UReq}
+\end{table}
+
+\section{Requirements}\label{Requirements}
+\begin{table}[H]
+    \centering  
+\begin{tabular}{ |P{1.5cm}||P{4.5cm}||P{7cm}||P{1.5cm}|  }
+ \hline
+ \multicolumn{4}{|c|}{\textbf{Technical Requirements}} \\
+ \hline
+ Req. ID & Name & Requirement & Parent \\
+ \hline
+  \reqid \label{test:EMG} & EMG & thresholds to define different types of movement is required & U\ref{ureq:Drink} \\
+ \hline
+ \reqid \label{req:extension} & @ maximum extension &  Lift a  minimum 0.5kg & U\ref{ureq:Drink}  \\
+ \hline
+  \reqid & Finger carry load (static)&Minimum of 0.5kg  & U\ref{ureq:Drink}  \\
+ \hline
+ \reqid & Safe Input device & sEMG to prevent repetitive strain injuries&U\ref{ureq:Input device}\\
+ \hline
+ \reqid & IMU & Use inertial measuring unit to select motor &U\ref{ureq:Input device}\\
+ \hline
+ \reqid \label{test:Latency} & Latency & Maximum of latency 1.0 seconds &U\ref{ureq:Input device}\\
+ \hline 
+ \reqid & User safety & EMG system Should be self-contained to ensure low risk of electrocution with the use of wireless connection to manipulator & U\ref{ureq:Safety}\\
+ \hline
+ \reqid \label{req:force} & Force & May produce a maximum force of 194.50 N\cite{force} &  U\ref{ureq:Safety}  \\
+ \hline
+\end{tabular}
+\caption{Table of requirements}
+    \label{tab:TReq}
+\end{table}
+\\
+
+
+\section{Delimitation's}\label{Delimitations}
+To design a complete prostheses for a person with dis-articulation, requires that there is money and time available to do so.
+Due to the lack of money and time in this project, a concept based prostheses will be build upon the design of the Crustcrawler robotic manipulator from Crustcrawler robotics this utilises the servos from Dynamixel. The controls for the prostheses, will also be limited to two sEMG signals and three signals from an accelerometer, the amount of signals from user will limited the control design approach. All these components will be describe in the next chapters.
+
+
+

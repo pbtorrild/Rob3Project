@@ -47,6 +47,8 @@
 \usepackage{array,booktabs}
 % Enable the use of frames around, e.g., theorems
 % The framed package is used in the example environment
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+
 \usepackage{framed}
 \usepackage{float}
 \usepackage{tikz}
@@ -123,7 +125,7 @@
 
 \setcitestyle{authoryear, open={((},close={))}}
 \usepackage{wrapfig}
-
+\usepackage{csquotes}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Code stuff
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -132,6 +134,12 @@
 \usepackage{color}
 \usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
 \usepackage{multicol}
+
+
+\usepackage{listings}
+\input{Setup/Listing.tex}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Misc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,0 +1,31 @@
+\begin{lstlisting}[frame=single,language=Arduino] 
+void emgCom(int &sumx, int &sumy, int &sumz, int &sumemg1, int &sumemg2 ) {
+  byte disbyte[22];
+  bool chkRec = false;
+  while (chkRec == false) {
+    if (Serial2.available() >= 24) {
+      if (Serial2.read() == 126) {
+        for (int i = 0; i <= 22; i++) {
+          disbyte[i] = Serial2.read();
+        }
+        int chkSum = 0;
+        for (int i = 2; i <= 22; i++) {
+          chkSum = chkSum + disbyte[i];
+        }
+        if (lowByte(chkSum) == 0xFF) {
+          sumz = disbyte[13] + (disbyte[12] * 256);
+          sumy = disbyte[15] + (disbyte[14] * 256);
+          sumx = disbyte[17] + (disbyte[16] * 256);
+          sumemg1 = disbyte[19] + (disbyte[18] * 256);
+          sumemg2 = disbyte[21] + (disbyte[20] * 256);
+          if( sumemg1<=1024 && sumemg2 <=1024 ){
+          chkRec = true;
+          }
+          else{}
+        }
+      }
+    }
+  }
+  return;
+}
+\end{lstlisting}

@@ -1,0 +1,28 @@
+Communication between the PC and the Teensy is setup so that the Teensy have to receive a string. The string have to contain an AB at the beginning and at the end DC and a newline character $'\backslash n'$. As a delimiter for the string the choice fell on $'\colon'$ a colon, so for each joint there is send a value to give a goal position and and a movement speed. The packet is has to have this form:\\
+\begin{center}
+     AB\colon$joint_1$ goal\colon$joint_1$ speed\colon$joint_2$ goal\colon$joint_2$ speed\colon$joint_3$ goal\colon$joint_3$ speed\\\colon$joint_4$ goal\colon$joint_4$ speed\colon$joint_5$ goal\colon$joint_5$ speed\colon DC\colon$\backslash n$   \\
+    
+\end{center}
+   
+When the Teensy receives the message it checks for the AB characters, if they are found, it processes each value and stores temporarily, at the end it checks for DC and if these characters are there as well the Teensy will store the values properly. \\
+The feedback communication from the Teensy to the PC is send with the delimiter of ' ' a white space, when the Matlab program receives the message through serial port it will store the values in an array that takes this form:\\
+ \begin{center}
+     \emph{The converted message in Matlab from the Teensy}\\
+     $10 \times 1$~array
+ \end{center}
+
+\[ \left( \begin{array}{c}
+Joint_1 \mbox{ current position}   \\
+Joint_1 \mbox{ current velocity}  \\
+Joint_2 \mbox{ current position}   \\
+Joint_2 \mbox{ current velocity}  \\
+Joint_3 \mbox{ current position}   \\
+Joint_3 \mbox{ current velocity}  \\
+Joint_4 \mbox{ current position}   \\
+Joint_4 \mbox{ current velocity}  \\
+Joint_5 \mbox{ current position}   \\
+Joint_5 \mbox{ current velocity}
+\end{array} \right)\] \\
+
+All data points can then be used in the feedback control part for the prostheses. 
+

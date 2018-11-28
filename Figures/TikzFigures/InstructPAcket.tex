@@ -1,0 +1,109 @@
+\begin{figure}[H]
+    \centering
+\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
+%uncomment if require: \path (0,158.99999237060547); %set diagram left start at 0, and has height of 158.99999237060547
+
+%Shape: Rectangle [id:dp6250925726121845] 
+\draw   (10,30) -- (70,30) -- (70,50) -- (10,50) -- cycle ;
+%Shape: Rectangle [id:dp7150581119099197] 
+\draw   (70,30) -- (130,30) -- (130,50) -- (70,50) -- cycle ;
+%Shape: Rectangle [id:dp4157977425803503] 
+\draw   (130,30) -- (190,30) -- (190,50) -- (130,50) -- cycle ;
+%Shape: Rectangle [id:dp8588453097331337] 
+\draw   (190,30) -- (270,30) -- (270,50) -- (190,50) -- cycle ;
+%Shape: Rectangle [id:dp3240542971310183] 
+\draw   (350,30) -- (410,30) -- (410,50) -- (350,50) -- cycle ;
+%Shape: Rectangle [id:dp8255905540167148] 
+\draw   (410,30) -- (470,30) -- (470,50) -- (410,50) -- cycle ;
+%Shape: Rectangle [id:dp3504189874809429] 
+\draw   (270,30) -- (350,30) -- (350,50) -- (270,50) -- cycle ;
+%Shape: Rectangle [id:dp14784139403972163] 
+\draw   (10,109.5) -- (110,109.5) -- (110,129.5) -- (10,129.5) -- cycle ;
+%Shape: Rectangle [id:dp6901276280736819] 
+\draw   (110,109.5) -- (190,109.5) -- (190,129.5) -- (110,129.5) -- cycle ;
+%Shape: Rectangle [id:dp7962109651151303] 
+\draw   (330,89.5) -- (470,89.5) -- (470,109.5) -- (330,109.5) -- cycle ;
+%Shape: Rectangle [id:dp22518828865075857] 
+\draw   (190,109.5) -- (250,109.5) -- (250,129.5) -- (190,129.5) -- cycle ;
+%Shape: Rectangle [id:dp8071011784893514] 
+\draw   (330,109.5) -- (400,109.5) -- (400,129.5) -- (330,129.5) -- cycle ;
+%Shape: Rectangle [id:dp6565443085961074] 
+\draw   (10,10) -- (190,10) -- (190,30) -- (10,30) -- cycle ;
+%Shape: Rectangle [id:dp7685957084117421] 
+\draw   (190,10) -- (270,10) -- (270,30) -- (190,30) -- cycle ;
+%Shape: Rectangle [id:dp4215711805925242] 
+\draw   (350,10) -- (470,10) -- (470,30) -- (350,30) -- cycle ;
+%Shape: Rectangle [id:dp36748275994822155] 
+\draw   (270,10) -- (350,10) -- (350,30) -- (270,30) -- cycle ;
+%Shape: Rectangle [id:dp5326572155761315] 
+\draw   (10,89.5) -- (110,89.5) -- (110,109.5) -- (10,109.5) -- cycle ;
+%Shape: Rectangle [id:dp7964285396518918] 
+\draw   (250,109.5) -- (330,109.5) -- (330,129.5) -- (250,129.5) -- cycle ;
+%Shape: Rectangle [id:dp6204398584543338] 
+\draw   (110,89.5) -- (330,89.5) -- (330,109.5) -- (110,109.5) -- cycle ;
+%Shape: Rectangle [id:dp8858871341925003] 
+\draw   (400,109.5) -- (470,109.5) -- (470,129.5) -- (400,129.5) -- cycle ;
+%Straight Lines [id:da1982468191176332] 
+\draw    (490,70) -- (40,70) ;
+
+
+%Straight Lines [id:da9492408394597669] 
+\draw    (40,70) -- (40,78) ;
+\draw [shift={(40,80)}, rotate = 270] [fill={rgb, 255:red, 0; green, 0; blue, 0 }  ][line width=0.75]  [draw opacity=0] (8.93,-4.29) -- (0,0) -- (8.93,4.29) -- cycle    ;
+
+%Straight Lines [id:da8759495506427029] 
+\draw    (480,30) -- (490,30) ;
+
+
+%Straight Lines [id:da5653929071720423] 
+\draw    (490,30) -- (490,70) ;
+
+
+
+% Text Node
+\draw (40,40) node   {$0xFF$};
+% Text Node
+\draw (100,40) node   {$0xFF$};
+% Text Node
+\draw (160,40) node   {$0xFD$};
+% Text Node
+\draw (100,20) node  [align=left] {Header};
+% Text Node
+\draw (230,20) node  [align=left] {Reseved};
+% Text Node
+\draw (230,40) node   {$0x00$};
+% Text Node
+\draw (310,40) node   {$ID$};
+% Text Node
+\draw (310,20) node  [align=left] {Packet ID};
+% Text Node
+\draw (380,40) node   {$LEN\_L$};
+% Text Node
+\draw (440,40) node   {$LEN\_H$};
+% Text Node
+\draw (410,20) node  [align=left] {Packet Length};
+% Text Node
+\draw (60,119.5) node   {$instruction$};
+% Text Node
+\draw (60,100) node  [align=left] {Instruction};
+% Text Node
+\draw (150,119.5) node   {$Param\_1$};
+% Text Node
+\draw (220,119.5) node   {$...$};
+% Text Node
+\draw (290,119.5) node   {$Param\_n$};
+% Text Node
+\draw (220,99.5) node  [align=left] {Parameter};
+% Text Node
+\draw (370,119.5) node   {$CRC\_L$};
+% Text Node
+\draw (430,119.5) node   {$CRC\_H$};
+% Text Node
+\draw (400,99.5) node  [align=left] {16bit CRC};
+
+
+\end{tikzpicture}
+
+    \caption{Structure of the instruction packet}
+    \label{fig:Instructsctruct}
+\end{figure}

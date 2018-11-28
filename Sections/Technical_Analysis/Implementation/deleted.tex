@@ -1,0 +1,46 @@
+As shown below the code of switching the motors is presented. This code is a function implemented to control the signals of the accelerometer. This code makes use of the Z-axis, which is the the axis it is meant to operate in when the user lifts its shoulder.\\
+\begin{lstlisting}[frame=single] 
+function [motorswitch,timeChk,timer] = MotorSelecet(DD,motorswitch,timeChk,timer)
+    if (DD>800 && timeChk==false)
+        motorswitch = motorswitch + 1;
+        timeChk=true;
+        timer =tic;
+    elseif (DD < 450 && timeChk==false)
+        motorswitch = motorswitch - 1;
+        timeChk=true;
+        timer=tic;
+    else
+        if timer>= 2
+        timeChk=false;
+        end
+    end   
+    if (motorswitch > 4)
+        motorswitch = 1;
+    elseif (motorswitch < 1)
+        motorswitch = 4;
+    end  
+end
+  \end{lstlisting}
+  in line 1 the inputs and outputs are initialized. The motorswitch is intented as a variable therefore it is set to 1. The timechecker is to acess the if statements and also to limit the amount of statements that is run.\\
+  DD is set to be equal to the greybox, which is an array. in the next lines, line 2 and 6 if statements are used to access the array number 3, which is the acceleration of our "Greybox" or accelerometer. If the acceleration of z is over 800 and the timechk is false our statement will switch from motor 1, to motor 2 which is set as the variable "2". Then the timechk will convert to "true", so that it wont run the other if statement simultaneously. Tic is to measure time taken of the statement.\\
+  From line 11 the time of measurements is set to 2 seconds to make sure the stream of statements doesn't pour in, and then the user has enough time to set the motors.The timechk will then be set to false so it can run the if statements again after the loop. The if statements in line 15 and 16 regulates the variable "motorswitch", so it wont exceed "4", which is the only amount of motors used in the crustcrawler.\\
+  Lastly the variables before the first run is cleared and the new "motorswitch" variable is displayed.\\
+  
+  
+  \section{Checksum}
+  The checksum calculated by taking the sum of all bytes in the API-package, this is the package not including the Start Delimiter and the length bytes, and dividing it by 256 (see eq \ref{ChecksumEq1}). it is important to remember that the checksum is an integer, as such it is rounded to the nearest whole number. said number is then multiplied by 256(see eq \ref{ChecksumEq2}). the original sum and the resulting value is then subtracted, this result in the checksum value.
+eg.
+\begin{equation}\label{ChecksumEq1}
+1151/256=4,496\\
+\end{equation}
+\begin{equation}\label{ChecksumEq2}
+4 \cdot 256=1024\\
+\end{equation}
+\begin{equation}\label{ChecksumEq3}
+1151-1024=127.\\ 
+\end{equation}
+\begin{equation}\label{ChecksumEq4}
+Checksum=127\\ 
+\end{equation}
+When the package is received on the other end it is important to verify the checksum. This is done to ensure the package havent been corrupted during transit.
+This works on the principle that the sum of the API-package with the checksum added must be 256. if the result is anything else, then the transmission have been corrupted, and should be disregarded.

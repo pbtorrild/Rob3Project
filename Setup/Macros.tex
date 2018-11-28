@@ -161,3 +161,11 @@ $\mathbb{R}^{#1}$
 \newcommand{\suggestion}[1]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue]{#1}}
 
 \newcommand{\Cframe}[1]{$\{#1\}$}
+\newcounter{requirementid}
+\newcommand{\reqid}{R\refstepcounter{requirementid}\therequirementid}
+
+\newcounter{userrequirementid}
+\newcommand{\userreqid}[1]{U\refstepcounter{userrequirementid}\label{ureq:#1}\theuserrequirementid
+
+
+}
