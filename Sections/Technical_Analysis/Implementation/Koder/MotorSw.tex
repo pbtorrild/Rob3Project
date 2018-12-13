@@ -1,24 +1,21 @@
 \begin{lstlisting}[frame=single,language=Arduino] 
-void MotorSwitch(int &MotorNR, int DD,bool &timeCehk,unsigned long &Time){
-    if (DD>800 && timeCehk==false){
-        MotorNR = MotorNR + 1;
-        timeCehk=true;
-        Time = millis();
-    }
-     if (DD < 450 && timeCehk==false){
-        MotorNR = MotorNR - 1;
-        timeCehk=true;
-        Time = millis();
-    }
-    if (millis() - Time >= 300){
-      timeCehk=false;
-    }
-    if (MotorNR > 4){
-        MotorNR = 1;
-    }
-     if (MotorNR < 1){
-        MotorNR = 4;
-    } 
-    else{}
- }
+void MotorSwitch(int &MotorNR, int &ZZ, bool &timeCehk, long &Time) {
+  int ZLimitUpper = 850;
+  int ZLimitLower = 500;
+  long TimeLimit = 3000;
+  long t = millis();
+  if ((t - Time) >= TimeLimit){timeCehk = false;}
+  else{timeCehk = true;}
+  if ((ZZ > ZLimitUpper) && (timeCehk == false)){
+    Time = millis();
+    MotorNR = MotorNR + 1;
+    if (MotorNR >= 5){MotorNR = 1;}
+  }
+  if ((ZZ < ZLimitLower) && (timeCehk == false)){
+    MotorNR = MotorNR - 1;
+    Time = millis();
+    if (MotorNR <= 0){MotorNR = 4;}
+  }
+  return;
+};
 \end{lstlisting}

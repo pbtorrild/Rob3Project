@@ -1,0 +1,20 @@
+\subsubsection*{RS232 to RS485} \label{sec:RS485}
+The radio module and robot runs with two different communication standards. Therefore a conversion unit between the two standards is needed,this project uses the BOB-10124 to handle the conversion. 
+\begin{figure}[H]
+    \centering
+    \input{Figures/TikzFigures/RS232toRS485.tex}
+    \caption{RS232 to RS485 conversion}
+    \label{fig:RSPROTO}
+\end{figure}
+\noindent
+The two communication-systems are both standards for serial communication. However the RS-232 only supports point to point(PTP) transmitting and receiving, while RS-485 can handle the communication of up to 32 devices and the speed can be set significantly higher. A system utilising RS-232 can transmit at $20 Kbits/s$ where a system with RS-485 can transmit at $10 Mbits/s$. The length of the data transmission inside a cable is also higher with RS-485 where the system can run on a $1200 m$ cable, while RS-232 can only cover just under $16$ meters of cable. \\
+The use of cable in this project do not exceed the cable length supported by RS-232. However, there is a need to daisy chain the 5 servo motors on the robot which is the main reason why there is a conversion between the RS-232 used by the XBee and RS-485 used by the Dynamixel servos.\\
+
+%To communicate between the Teensy and the Dynamixel servos, there is a need for a conversion from the RS-232 protocol to the RS-485. This conversion is due to the fact that the Teensy uses the RS-232 protocol as communication and the servos utilises the Rs485 protocol.\\
+\noindent
+RS-232 can receive and transmit at the same time, making it full dupelx, however since it is chained to a system running with a 2-wired-RS-485 it only reads or transmits, which means it is half duplex. The signal the RS-232 send is 8-bit and purely zeroes and ones. The signal is idle on 1, so when the bit goes to zero the start is initiated. The 9600N1 is the checksum of the system and disregards uneven parity, which means that bit-streams with, e.g, 3 1's will not be read. \\
+\noindent
+The RS-485 is the differential signal between the two signals A and B, where the difference decides whether it is a 0 or a 1 being sent.\\
+The RS-485 consists of two lines that often, but not in this case, is twisted together for higher noise immunity. The first line, A, is low for 0 and high for 1, while the other line, B, is the inverted signal, that is high for 1 and low for 0. As mentioned above, the system used in this project is using the two wired configuration of RS-485, where the system is half duplex.  \cite{RS232/485:online}
+
+

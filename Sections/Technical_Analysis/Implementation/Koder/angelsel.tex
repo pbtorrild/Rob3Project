@@ -1,14 +1,46 @@
 
 
 \begin{lstlisting}[frame=single,language=Arduino]
-void AngleSelect(int32_t &ArrNow, int &MotorNR, int &ArrGoal, int EMG_1, int EMG_2){
-      int AngleChange =6;
-      if (EMG_1>= 300 && EMG_2<= 50){
-          ArrGoal = ArrNow + AngleChange;
+void AngleSelect(int32_t &ArrNow, int &MotorNR, int &ArrGoal, int EMG_1, int EMG_2, int32_t &PWM, bool &on){
+  int thredH = 50;
+  int thredL = 50;
+  int AngleChange = 10;
+  if (MotorNR == 1){
+    if (EMG_1 >= thredH && EMG_2 <= thredL){
+      ArrGoal = ArrGoal + AngleChange;
+      PWM = 360;
+      on = true;
+    }
+    else if (EMG_2 >= thredH && EMG_1 <= thredL){
+      ArrGoal = ArrGoal - AngleChange;
+      PWM = 360;
+      on = true;
+    }
+    else{
+      if (on == true){
+        ArrGoal = ArrNow;
       }
-       else if (EMG_2>=300 && EMG_1<=50){
-          ArrGoal = ArrNow - AngleChange;
-         }
-         else{}
-}
+      on = false;
+    }
+  }
+  else{
+    if (EMG_1 >= thredH && EMG_2 <= thredL){
+      ArrGoal = ArrGoal + AngleChange;
+      PWM = 360;
+      on = true;
+    }
+    else if (EMG_2 >= thredH && EMG_1 <= thredL){
+      ArrGoal = ArrGoal - AngleChange;
+      PWM = 262;
+      on = true;
+    }
+    else{
+      if (on == true){
+        ArrGoal = ArrNow;
+        on = false;
+      }
+    }
+  }
+  return;
+};
 \end{lstlisting} \label{fig:AS}

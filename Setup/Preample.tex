@@ -88,7 +88,8 @@
 \titleformat*{\paragraph}{\normalfont\normalsize\bfseries}
 \titleformat*{\subparagraph}{\normalfont\normalsize\bfseries}
 \usepackage[bottom]{footmisc}
-
+\usepackage{titlesec} % Allows creating custom \section's\usepackage{url}
+\titleformat{\testing}{\large\scshape\raggedright}{}{0em}{}[\rule{.75\linewidth}{1pt}] % Section formatting
 % Clear empty pages between chapters
 \let\origdoublepage\cleardoublepage
 \newcommand{\clearemptydoublepage}{%
@@ -180,11 +181,4 @@
 	pdfstartview=FitH%
 }
 \usepackage{gensymb}
-
-\lstset { 
-    language=Matlab,
-    caption=,
-    backgroundcolor=\color{black!5}, 
-    basicstyle=\footnotesize,
-}
 \usepackage{lscape}

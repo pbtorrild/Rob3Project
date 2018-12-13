@@ -1,58 +1,12 @@
-\subsection{Controller design} \label{PID}
-There are one specific controller that is related to this project, the PID (Proportional, Integral, Derivative) controller. This PID controller is used to delimit the errors inside a loop. Each of these Components driving the error to zero, which can be read about in the sections to come. Every component has its own allocated gain, a gain is the ratio between the output divide by the input. The objective in this system is to move from one angle to another, the error would then be difference in angles over time. In this section \textbf{\textit{U}} is denoted as being the effort to be put in the system.\\
 
-\begin{figure}
-    \centering
-    \input{Figures/TikzFigures/PIDLAYout.tex}
-    %\includegraphics{Figures/Technical_figures/1-25.jpg}
-    \caption{Layout of a PID controllers response on the error}
-    \label{fig:mPID}
-\end{figure}
-
-
-\begin{equation}\label{PID}
-    U=K_P\cdot\textit{e}+K_I\cdot\int\textit{e}+K_D\cdot\textit{e}\frac{d}{dt}
-\end{equation}
-
-\paragraph{The Proportional} gain $K_P$ in eq.\ref{PID} is the gain multiplied with the error(e) in eq. \ref{PID}, resulting in the effort. The larger gain a fast rise time, the rise time is the time it takes from 10\% to 90\% of the final angle. However this controller can only be used alone when the system can tolerate a constant error in steady state, a steady state error is an error over time that does not diminish. The proportional gain also has a tendency to overshoot the desired value if the gain is too high\cite{Control1DK}.\\
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Figures/Technical_figures/PGAIN.png} 
-    %\input{Figures/TikzFigures/Pgain.tex}
-    \caption{A $K_P$ of 1 then only the error has and effect on the effort}
-    \label{fig:pGain}
-\end{figure}
-
-\paragraph{The Integral} gain $K_I$ in eq. \ref{PID} of the controller, accumulates error over time to output an effort to be put in the system. This means that it has a damping effect on the system. This Integral component can be used to minimise overshoot and eliminated the steady state error, that is in the p gain alone. This system accomplish this at the cost of a slow rise time. Thereby being slower to reach its desired destination than with a P gain alone, but will reach there in time. As safety is important when working with people this system would be very suited. However as this is a slow system the precision should be weighed against speed\cite{Control1DK}. \\
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Figures/Technical_figures/IGAIN.png} 
-    %\input{Figures/TikzFigures/Igain.tex}
-    \caption{A $K_I$ gain of 1 then only the sum of changes in the error has an effect on the effort.}
-    \label{fig:IGain}
-\end{figure}
-\paragraph{The derivative} gain $K_D$ in eq. \ref{PID} of the controller, works on the rate of change in the system. So if there are a fast change when the manipulator moves or get pushed it will have a larger output in the effort within the system, but when there is no change in the system, it has no effect. This can be useful when there is a need for fast reaction within the system, but in the case of a human with a robotic prosthesis if the $K_P$ gain is too high it can result in unforeseen consequences .\\ 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{Figures/Technical_figures/DGAIN.png} 
-   %\input{Figures/TikzFigures/Dgain.tex}
-    \caption{A $K_D$ gain of 1 then only the rate of change in the error has and effect on the effort.}
-    \label{fig:DGain}
-\end{figure}
-
-\paragraph{Discrete time} In the real world we live in a continues time domain, but computers works in discrete time domain. The discrete time is not measured in seconds, but rather in time frames.\\
-
-On a note to a PID controller in theory, the perfect gains can be found, with the most suited rise time and settling time, but in practise this can be an expensive task. The expenses of the system can get high due to the need of a motor that is able to spin and stop at a rate that is suited for the PID controller, and sensors for the system needs to sense the changes within the system at the same rate.\\
 
 \subsubsection{Dynamixel Servo PID}
-In each Dynamixel servo there is an build in controller, that contains a feedback loop with an implemented PID controller with limiters to ensure that servos rotation velocity do not exceed a lower and an high threshold\cite{PIDmxx}. The feedback loop and the PID controller can be customised to fit the purpose of the objective.
+In each Dynamixel servo there is an build in controller. The controller contain a feedback loop with an implemented PID controller with limiters to ensure that servos rotation-velocity do not exceed a lower and a higher threshold\cite{PIDmxx}. The feedback loop and the PID controller can be customised to fit the purpose of a given task.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Figures/Technical_figures/PIDMX.PNG}
-    \caption{Internal build in PID controller\cite{PIDmxx}}
+    \caption{Internal PID controller in the Dynamixel servos\cite{PIDmxx}}
     \label{fig:PIDMX}
 \end{figure}
 
-The servos positing and velocity is analysed through the use of an encoder, places on the gearing of the motor.  
+The servos positioning and velocity is analysed through the use of an encoder, placed on the gearing of the motor.  

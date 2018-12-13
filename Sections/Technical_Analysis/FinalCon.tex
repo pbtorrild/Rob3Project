@@ -1,2 +1,18 @@
 \chapter{Final conclusion}\label{cp:Final-conclusion}
+
+Controlling a manipulator and easing every day of the end-user has been the goal.\\
+Persons with a high-level of amputation has been taken into consideration and it has been looked into how the struggles these persons can be overcome. By establishing a safe means of communication between the user and the prosthesis through a wireless connection and muscular contracting signals. The communication in this project is done with two standards and protocols. The wireless communication from the measuring box to the receiver was done with the Xbee protocol that utilises Bluetooth, from the receiver to the Teensy was done through the RS-232 communication protocol. Furthermore, the communication of the manipulator was done with the RS-485 and the Dynamixel servo protocol. \\
+The users were able to manipulate the prosthesis, through a test-setting of the project groups choice, and thereby utilising the muscular contractions that were implemented in the control of the prosthesis.\\
+To apply the needed control of muscular contractions signals further a understanding of these signals and how to handle them were analysed. The RMS was a convenient method and were already implemented in the hardware, the RMS filter gave a clear signal without must noise, this meant that the signal could be exploited, by setting some thresholds for the user, if the signal had a magnitude high then the threshold, the prosthesis will perfrom a specific task, depending on the control setup.\\
+To be able to control the prosthesis accurate without letting disturbance influence the system at a minimum, the advantage of having a PID controller in each Dynamixel servo is used. In this project, only a PI controller is implemented minimise the fast response from the derivative term.\\
+Analysing the different links and dynamics of the chosen prosthesis: The CrustCrawler helps to get a deeper understanding of how the motion of the chosen prosthesis works.\\
+Forward and inverse kinematics is used to get a better understanding of links, joints, rotation matrices and DH-parameters. Further dynamics, such as Lagrange-equations, lagranians and the Newton-Euler method, can be used to understand the torques, forces, velocities of the vectors of the body and the inward forces that the prosthesis can utilise. Thereby a greater understanding is given on which forces we can apply and how much velocity is required to e.g get to different positions within the prosthesis' capability.\\
+Testing and fine tuning was a large part of the implementation. After several iterations of testing let to this final product, the first implementation let the project team rethink their options due to the lag experienced when using MATLAB. Fortunately, this leads to making a more standalone version the was not tied to a computer to operate.
+
+
+
+
+%designing a system using sEMG sensors and an accelerometer to control the crustrawler. This was done by designing the neccesary software needed and assembling the needed hardware systems. The final solution uses an accelerometer to change motor choice and the EMG input to rotate around the chosen joint. this allows for easy control with a minimal amount of non userfriendly variables such as running in to singularities.
+
+%\textit{the choice of controlling the manipulator in joint space have proven to increase the user friendliness of the system while minimizing the potential troubles that could occur if controlling the end effecter in cartesean space.}
 \input{Sections/Technical_Analysis/Futurework.tex}

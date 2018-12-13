@@ -169,3 +169,9 @@ $\mathbb{R}^{#1}$
 
 
 }
+\newcounter{TestNumber}
+\newcommand{\testing}[1]{\section*{\refstepcounter{TestNumber}Test \theTestNumber\ - #1 \label{test:#1}
+}
+\addcontentsline{toc}{section}{Test \theTestNumber\ - #1}
+
+}

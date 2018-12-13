@@ -1,92 +1,169 @@
 \chapter{Implementation}\label{Implementation}
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\textwidth]{Figures/Technical_figures/Smallerflowchart.pdf}
-    \caption{Flowchart of the code used in this project}
-    \label{fig:my_label}
-\end{figure}
 
-\section{SW implementation}
-\subsubsection{ MotorSwitch }
+The first iteration of implementation was done through the use of the mathematical tool MATLAB; it consisted of 4 functions. The first received the data from the measuring box, the second decided an angle depending on the input from the user, the third selected a movement speed, and the last function wrote to the Teensy. Each function on its own was tested and was found to work separately. While implementing all the functions together in MATLAB a problem occurred with the communication between the computer, the measuring box and the Teensy. The problem may have been the buffer of the MATLAB which stores all data in a first in first out buffer (FIFO buffer). \\
+After this setback, an implementation directly on the Teensy was done, while the only use of the computer was to debug and visualise the input from measuring box and the angles of the CrustCrawler. This was done through the use of a program called \textit{Telemetry}, that is made for telemetry on drones. This program plots the values it receives, by CSV (comma separated values). Below is a figure of the Telemetry GUI used for debugging the system.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Figures/Technical_figures/Motor_select_flow.JPG}
-    \caption{Caption}
-    \label{fig:my_label}
+    \includegraphics[width=0.79\textwidth]{Figures/Technical_figures/GUIla.png}
+    \caption{GUI for debugging and setup}
+    \label{fig:GUI}
 \end{figure}
-As shown below the code of switching the motors is presented. This code is a function implemented to control the signals of the accelerometer. This code makes use of the Z-axis, which is the the axis it is meant to operate in when the user lifts the shoulder.\\
+The use of Telemetry helped since the debugging and the setup of the prosthesis towards the user could be done visually instead of reading the outputs directly in the Arduino serial console.
+
+Arduino is a program that can compile source code for the Arduino microcontroller , but there is add-on's to the Arduino program, that enables the Arduino compiler to compile and write to other microcontrollers such as the Teensy. The version of the Arduino compiler that is used in this project is the 1.8.6 there is a newer version, but that is not compatible with the Flexcan add-on that is used for communicating with the Teensy. In the next couple of sections these codes can be read.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/diagen.png}
+    \caption{The flowchart is a visual representation of how the main program is structured on the Teensy.}
+    \label{fig:generalflowchart}
+\end{figure}
+
+\section{Software implementation}
+In this section, there are descriptions of the different functions that are implemented on the Teensy. 
+\subsection*{Measuring box}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/emgcom.png}
+    \caption{Flowchart of the "emgcom" code}
+    \label{fig:emgcom}
+\end{figure}
+To get the data the measuring box provides there is a need to verify if data is correctly received.
+The checksum Method is used to ensure the transmitted data has not been corrupted or disrupted.\\
+The bytes excluding the Start delimiter, the Length bytes and the checksum will be referred to as the data-structure.\\
+The Xbee checksum is calculated by adding all the bytes in the data structure, keeping only the 8 lowest bits in the result and subtracting it from 0xFF in hexadecimal(255 in Decimal)\cite{Calculat82:online}.
+The sum of the data structure with the transmitted checksum added is 0xFF, if the transmission has not been altered \cite{XbeeManual:online}.
+
+\subsubsection{Code explanation}
+ \begin{figure}[H]
+    \centering
+\input{Sections/Technical_Analysis/Implementation/Koder/Checksum.tex}
+    \caption{The source code for interpreting the data from the mearsuring box}
+    \label{fig:EMG}
+\end{figure}
+ 
+\paragraph{Line 2-9}The array \textit{disbyte[22]} is made.
+Then the Teensy search the data from the Xbee to look for the start delimiter which is 126 or 0x7E and stores the next 23 of bytes.
+\paragraph{Line 10-13:}The int \textit{chkSum} is the sum of the data structure and the checksum byte. It is calculated by adding up the the bytes in the disbyte[22] array excluding the two length bytes from the Xbee.
+
+\paragraph{Line 14-19}The \textit{chkSum} value is tested to ensure it has the value 0xFF. If this is true the sum of z acc., sum of y acc., sum of z acc., sum of emg1 and sum of emg2 are calculated to be used in another function.
+
+
+\paragraph{Line 20} Due to the \textit{chkSum} in some instances can be 255 without being altered. One more check than the check sum is done through the \textit{if} statement where if the EMG signal is above 1024 then \textit{chkRec} will not be set true. This will keep the loop running till it has a correct packet.
+
+\paragraph{Lowbyte and highbyte} Low byte is a term used when more than one byte is transmitted. The low byte refers to the byte that holds the least significant part of an integer. For any integer type the low byte stores the part of the integer consisting of the powers of to from $2^0$ to $2^7$ which mean that an integer with a value below 255 can be held in the low byte. The structure from the XBee is ordered from higbyte to lowbyte, meaning that the highbyte is the leftmost byte of a variable and the lowbyte is the rightmost byte. 
+
+\paragraph{Test "Receiving data from measuring box"}
+For this project to work a communication link between the Xbee and the Teensy needs to be established. The code was tested, but a flaw in the checksum meant that there was a need to isolate the problem, values that came through was above a certain threshold. After the implementation the if statement in \textit{line 20} in \ref{fig:EMG} the test of the communication was a success, it was able graph the output of the measuring box in the GUI.
+
+\subsection*{MotorSwitch}\label{MotorSwitchCode}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/motorselect.png}
+    \caption{The flowchart of motor selection}
+    \label{fig:motorsele}
+\end{figure}
+As shown below the code of switching the motors is presented. This code is a function implemented to control the signals of the accelerometer. This code makes use of the Z-axis, which is the axis it is meant to operate in when the user lifts the shoulder.\\
 
 \begin{figure}[H]
     \centering
 \input{Sections/Technical_Analysis/Implementation/Koder/MotorSw.tex}
-    \caption{Motor Selection, a function written in Arduino code}
+    \caption{The source code for the motor switch}
     \label{fig:motorSel}
 \end{figure}
-
-In line 1, an initialisation is commenced with the variables it is wished to use.\\
-At Line 2 and 7, two different if statements is produced. The statements only run if DD is over 800, and if timecheck is false. DD is the accelerometers Z-axis acceleration. Timechek is always false unless a if statement is run as seen in line 4 and 9.\\
-MotorNR has a pre-set of 1, which means it is set to motor 1. When the different if statements is run the motor will switch respectively to the if statements.\\
-Line 12 consists of the current time and the time passed, which has to be more or equal to 3 seconds. timecheck will then be set to false so the if statements can be run again.\\
-The last lines of code is simply to keep the motors from exceeding the number of motors available.
-
-\subsubsection{Angleselect}
+\noindent
+\paragraph{Line 1-5:} An initialisation is commenced with the variables it is wished to use.
+\paragraph{Line 6-7} This if statement states that the t - time must be higher or equal to "Timelimit" to proceed in setting timecheck = false, so that the time taken to switch motors won't exceed a certain threshold, and to set timecheck = false so the other 2 if statements can be run.
+\paragraph{Line 8-17}Two different if statements is produced. The first if-statement is only run if ZZ is over 850, and if timecheck is false. ZZ is the accelerometer's Z-axis acceleration. Timecheck is always false unless the if statement in line 6 is not true. The second if-statement states that if ZZ is below the lower limit of 500, it switches the motor in a negative direction.\\
+MotorNR has a preset of 1, which means it is set to motor 1. When the different if statements is run the motor will switch respectively to the if statements.
+\paragraph{Line 11 + 16}The last lines of code is simply to keep the motors from exceeding the number of motors available. E.g if MotorNR is lower than 0, then switch to motor 4 etc.
+\paragraph{Test of "Motor selection"}
+For the user to control each motor separately the function motor select was tested and was a success after adding in \textit{line 3, 4} the reason to this was that motor would change every time it looped the main loop if the accelerometer had a signal above or below the thresholds.  
+\subsection*{Angleselect}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{Figures/Technical_figures/Anlge_select_flow.JPG}
-    \caption{Flowchart of the }
-    \label{fig:my_label}
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/angleselect.png}
+    \caption{Flowchart of the angleselect code }
+    \label{fig:angleSel}
 \end{figure}
 AngleSelect is a function that increases or decreases the angle of the manipulator. This makes the manipulator more manoeuvrable and easy to steer for the user.\\
 \begin{figure}[H]
     \centering
-   
 \input{Sections/Technical_Analysis/Implementation/Koder/angelsel.tex}
-
     \caption{Angle Selection, a function written in Arduino code}
     \label{fig:AngleSel}
 \end{figure}
-Line one consists of the function and its parameters, where ArrNow is the angle which the manipulator is in, and ArrGoal is which angle is desired of the user.\\
-In line 2 AngleChange is set to 6, which will be used in line 4.\\
-Line 3 is a if statement with two parameters that has to be true, EMG1 must be over or equal to 300 and EMG2 must be lower or equal to 50. When this statement is run a simple equation will begin, which adds ArrNow and the AngleChange together, to move the motor. Line 6 and 7 is simply the same but reversed, so it is possible that the AngleChange can be retracted to move the motor the opposite direction. 
+\paragraph{Line 1} Consists of the function and its parameters, where ArrNow is the angle which the manipulator is in, and ArrGoal is which angle is desired of the user.\\
+\paragraph{Line 2-4} The thresholds and anglechange variable is set\\
+\paragraph{Line 6-14}is a if statement with two parameters that has to be true, EMG1 must be over or equal to thredH and EMG2 must be lower or equal to thredL. When this statement is run a simple equation will begin, which adds ArrNow and the AngleChange together, to move the motor. Line 11-15 is simply the same, but reversed, so it is possible that the AngleChange can be retracted to move the motor the opposite direction. 
+\paragraph{Line 16-22 + 34-37} is simply to set the Arrgoal to Arrnow which is used in the main-loop.
 
-\subsection{CheckSum and checksum verification}
-The Checksum Method is used to ensure the transmitted date hasnot been corrupted or disrupted.
-\paragraph{Checksum:}In the Xbee byte array(24Bytes), in see fig:\ref{fig:XbeeDataFromOldSolution}, the checksum is the last byte in the array.\\
-\begin{figure}[H]
- \centering 
-    \includegraphics[scale=0.7]{Figures/EMG/XbeeDataArray.png}
-    \caption{How the bytes in the Xbee Byte array, is structured}
-    \label{fig:XbeeDataFromOldSolution}
-\end{figure}
-The bytes excluding the Start delimiter, the Length bytes and the checksum is referred to at the API-specific structure. 
-The Xbee checksum is calculated by adding all the bytes in the API-specific structure, keeping only the 8 lowest bits in the result and subtracting it from 0xFF in hexadecimal(255 in Decimal)\cite{Calculat82:online}.
-\paragraph{Checksum Verification:}
-The sum of the API-specific structure with the transmitted checksum added is 0xFF, if the transmission has not been altered. As such the verification is done by verifying this.
-
-\subsubsection{Code explanation}
- \input{Sections/Technical_Analysis/Implementation/Koder/Checksum.tex}\label{CheckSumCode}
-\paragraph{Line 2-9}Firstly, the array \textit{disbyte[22]} is made.
-Then the teensy search the data from the Xbee to look for the start delimiter which is 126 or 0x7E and stores the next 23 of bytes.
-\paragraph{Line 10-13:}The int \textit{chkSum} is the sum of the API-specific structure and the checksum byte. It is calculated by adding up the the bytes in the disbyte[22] array excluding the two length bytes from the Xbee.
-
-\paragraph{Line 14-19}The \textit{chkSum} value is tested to ensure it has the value 0xFF. Then sum z, sum y, sum x, sum emg1 and sum emg2 are calculated to be used in the for data.
-
-
-\paragraph{Line 20} Due to that the \textit{chkSum} in some instances can be 255 without being altered. One more check than the check sum done through the \textit{if} statement where if the EMG signal is above 1024 then \textit{chkRec} will not be set true. This will keep the loop running till it as a correct packet.
-\subsubsection{Control algorithm}
-
-
-%\subsubsection{Communication protocol}
-%\input{Sections/Technical_Analysis/Implementation/ComProto.tex}
-%subsection{Communication between Teensy and CrustCrawler}
-\section{HW implementation}
-\subsection*{Wire connection}
+\subsubsection*{Pulse-width modulation (PWM)}
+Pulse-width modulations is a very simple but powerful principle. The principle consists of having a switch turn a given voltage \textit{on} and \textit{off}. The time it is \textit{on} is called the duty cycle and shows for how many percent of the time the switch is \textit{on}.  The average voltage and current in the device is then dependent on the duty cycle. Seen Below in figure \ref{fig:PWMUCH} is a figure showing the principle. A device is switched between 12V and \textit{off} with a duty cycle of 50 per cents given an average voltage of 6V.
+\input{Figures/TikzFigures/PWM.tex}
+\paragraph{Test of "Angle selection."}
+The angle select function was tested by inputting, the data from the measuring box into the function.  Through a couple of iteration the setting of AngleChange in \textit{line 4} was changed to find reasonable angle change that made it controllable for the user. 
+\subsection*{Visualisation of motor}
 \begin{figure}[H]
     \centering
-\input{Figures/TikzFigures/layOut/layOut.tex}
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/lyskode.png}
+    \caption{Flowchart of the MotorVis code}
+    \label{fig:motorvis}
+\end{figure}
+To help the user visualise the motor choice, two methods were used.\\
+Firstly two LEDs were placed on each manipulator joint to light up when the joint was chosen, and secondly, a seven segment display was attached to indicate the motor number.
+The actual motor number is transmitted from the Teensy as seen in section \ref{MotorSwitchCode} and received by the attached Arduino which runs the code showing the motor choice.
+
+\subsubsection{Code Explanation}
+
+\input{Sections/Technical_Analysis/Implementation/Koder/7SegLED.tex}
+  
+
+\paragraph{Line 1 to 15} The pins are initialised. Integers from \textit{a} to \textit{h} refers to the segments on the seven segment display and the \textit{LedMoter1} to \textit{LedMoter4} is the LEDs attached on each motor. The int \textit{incomingByte} is where the received motor number is written onto.
+
+\paragraph{Line 16 to 35} The \textit{setup} function is used to initialise the variables and define the baudrate. The LED and display segment variables are defined as inputs.
+
+\paragraph{Line 36 to 39} An \textit{if} statement is used to test if the number of characters received from \textit{serial} is grater than zero, as this would indicate data received. \textit{incomingByte} is defined as the motor number value received from serial.
+
+\paragraph{Line 40 to 53} If the received motor number is one, the \textit{if} statement is run and the corresponding LEDs and display segments are turned on/off to show the number one on the display and turn on the LED on motor one. 
+
+\paragraph{Line 55 to 62} The code here are omitted as the structure is identical to the code from line 41 to 53. The segments and LEDs are turned on/off to match the value of \textit{incomingByte} from one to four.
+
+\paragraph{Test of "Visual of representation motor select."}
+THe test was initially designed to run on the Teensy 3.5 micro-controller, together with the rest of the code, issues occurred with its implementation. this led to implementing an additional micro controller (arduino uno) in the system, dedicated to running the visualisation code. 
+Implementing the code on the arduino, the hardware setup was tested by pre-defining the \textit{incomingByte=2} and commenting out line 33 and 34. The statements were run accordingly, and when confirmed correctly the integer-value were manually changed, to ensure the display and LEDs worked correctly.\\
+When the hardware were confirmed to work correctly, line 33 and 34 were implemented and the Arduino were connected to the teensy 3.5 micro controller through the tx and rx pins. The system were turned on, and observed to correctly and reliably show the current joint chosen.
+
+
+\section{Hardware implementation}
+In this section, a description of how the implementation of the hardware is setup is done.
+\subsection*{Wire connection}
+To have any working parts there is a need to have an understanding of how the different components, that are provided, have to be wired. The wiring of the project was designed upon the different data-sheets and schematics. The first thing to look for is what supply-voltage the different devices can handle, and what pins are used for ground(gnd) and the supply voltage. 
+Incorrect supply-voltage and incorrect placement of ground can result in the component not working or even a burnt circuitry.\\
+\begin{figure}[H]
+    \centering
+%\input{Figures/TikzFigures/layOut/layOut.tex}
+    \includegraphics[scale=0.30]{Figures/Technical_figures/HWlayout.png}
     \caption{Wiring of the Teensy to external components}
     \label{fig:motorSel}
 \end{figure}
-\subsection*{sEMG placement}
-\input{Figures/TikzFigures/FigcontrolMan.tex}
+The next thing to look for is which communication protocol the different components utilises. This is important because different protocols do not work together. All this can be found on the data sheets provided by the manufacturers of each components.
+\paragraph{Test of "Connection between devices."}
+The of correct wiring was first carried out trough a visual inspection of the wiring before applying any power to the system. After visual inspection the power supply was turn on, luckily there was no "Magic smoke" appearing. That meant it was possible to check for connectivity between Teensy, CrustCrawler, measuring box and the Arduino that controllers the light on the CrustCrawler.
+By only adding one new component to the Teensy a time, it was easier to control the debugging of the connection between each component.
 
+\subsection*{Visualisation of motor}
+For the user to have a clear overview of which servo is in use, a 7 segment display is used to display what number of motor, the user has selected within the function \textbf{MotorSwitch}.
+\begin{figure}[H]\label{SchematicOfLED}
+    \centering
+\includegraphics[width=\textwidth]{Figures/Technical_figures/hwLEd.png}
+    \caption{Schematic of visual motor representation}
+    \label{fig:VismotorSel}
+\end{figure}
+ Furthermore 2 LED's was placed on each motor, each pair of LED's will illuminate when the particular motor is selected. The control of these LED's is done through another microcontroller(Arduino Uno), that is connected through RS-232 serial communication. This configuration allows the Teensy to have more time to process the data inputs from the measuring box, and focus on the control of the motors.
+ \paragraph{Test of "Hardware implementation of visual representation."}
+ This test was done through visual inspection. By looking at the selected motor in the GUI and looking at what LED that was illuminated and what number was displayed in the 7-segment display.
+ The test was a success and will aid the user in a more precises control of the CrustCrawler by visual cue's.
+ 
+ 

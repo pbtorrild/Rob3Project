@@ -1,75 +1,202 @@
 \chapter{Design}\label{ch:Design} %software architecture0,
-The design of a robotic system for a user having a shoulder disarticulation can be quite comprehensive. this report will strive to create a proof of concept, showing that the use of a robotic limb can assist the user in a daily task.
+The design of a robotic prosthesis system for a user having a shoulder disarticulation can be quite comprehensive. This report will strive to create a proof of concept fulfilling the requirements, showing that the use of a robotic limb has the potential to assist a user in a daily task.
 
-\section{showcase}
-to showcase this proof of concept, the task needing to be done has been chosen as assisting the user in drinking a cup of water.
+\section{General design solution}
+The solution to the problems presented in Chapter \ref{ch:FinalProb} is presented in the following section. In order to comply with the technical requirements a solution must have certain components.
 
-\subsection{Equipment description}
-For this project several pieces of equipment have been provided, as such the rest of this project will investigate how these can be used to accomplish our goal. the provided equipment consists of the CrustCrawler and a measuring box.
+\subsection*{Robot manipulator}
+An electrical prosthesis is based around a robotic manipulator. The robotic manipulators have several variables needed to be considered when choosing witch one to base the prosthesis design on. To satisfy requirement \ref{req:extension}, the manipulator needs to be able to carry $0.5 kg$. When fully extended and have an end-effector while being small enough to be plausibly attachable to a user.
 
-% Please add the following required packages to your document preamble:
-% \usepackage{graphicx}
-\begin{table}[H]
-\begin{tabular}{|P{3cm}||P{10cm}|}
+\subsection*{EMG detection unit}
+To control the manipulator, the user would need a control method, as mentioned in chapter \ref{Control} the use of EMG sensors would be ideal for the user. The EMG sensors use the muscle contractions as a signal, that changes depending on the contraction intensity. As the signal intensity changes depending on the contraction, certain thresholds needs to be created in order to satisfy Requirement \ref{req:EMGfatigue} while eliminating the risk of  muscles at rest activating the manipulator. 
+\input{Sections/Technical_Analysis/Design/Emg.tex}
 
-\hline
-\textbf{Crust-Crawler} & is a robotic manipulator made by Crust-Crawler Robotics.  it consists of 5x motors capable of being mounted in a wide variation of ways.  2x Links of varying length.  these can be assembled according to the users will. \\ \hline
-Moters                 & All five moters mounted on the Crust-Crawler are made by Dynamixel.  \\ \hline
-Xbee S1                   & Wireless radio capable of pairing to matching device creating a "cable" \\ \hline
-Teensy Board              & This is a micro controller and will work as the on board computer.      \\ \hline
-Supply  board             & This board supply power from a wall plug to our system                  \\ \hline
-\end{tabular}%
-\caption{Description and presentation of the Crustcravler setup components}
-\label{tableCrust}
-\end{table}
+\subsection*{Inertial measuring unit}% kort generelt omkring IMu og gyro og hvordan det kan bruges
+ In order supplement the EMG detection unit, an IMU with an accelerometer and/or a gyroscope can be used to control a manipulator by utilising a change in either orientation or acceleration. This can be done by attaching the IMU to a body-part on the user and having them move said body-part in a predetermined x, y or z-direction. An example could be placing the module on the users head or shoulder and having them accelerating it in a direction specified. This change in acceleration could then be used to change the motor chosen, or the motors angle depending on the degree of unit tilt or if the acceleration measured exceeded a preset threshold.
+
+\subsection*{Radio module}
+Requirement \ref{req:electrocution} specifies the user not being attached to the manipulator in order to remove the risk of the user being electrocuted. By definition there is a need to transmit between the user and the manipulator wireless, therefore a radio module would be needed. However according to requirement \ref{test:Latency} the latency experienced by the user when operating the manipulator cannot exceed one second. The requirements of the radio modules would therefore need a fast rate of data transmission between the modules for the user not to experience a lag in control of the manipulator.
+
+\subsection*{PC/Micro-controller}
+To control the data transmitted it has to be interpreted and converted into a manipulator movement by a computer. The computer would work as the systems "brain" and could operate in several ways. One option could be to use a laptop to receive data from the sensors while computing and transmitting the data to a micro-controller attached to the manipulator. Another option could be for the micro-controller itself to receive the data from the sensors and directly move the manipulator without the need of an attached laptop. 
+\subsubsection*{Control Systems}
+%Intro:
+The control system takes the input signal and use it to gain the desired output. By this definition the system could  e.g, take the signal of a muscle contraction and translate it into a motor angle change change.
+\input{Figures/TikzFigures/OpenClosedLoops.tex}
+As seen on the figure \ref{fig:openclose} the open loop manages to compute the reference signal so that it is to be equal to the desired output, assuming that the model of the system is perfect. In the case where a disturbance is introduced to the open loop system, the system can not adjust for the disturbance and would produce an unrecognisable error.\\
+The closed-loop system/feedback loop can measure the output error and equals it towards the input while gradually minimising the disturbance making the system linear. The error deletion will make the system easier to work with, but this is another section that will be covered in \ref{PID}.\\ 
+Utilising these control systems can be done by transfer functions. Transfer functions is the Laplace formulae of the control system design.\\
+
+\paragraph{The Golden Formula}\\
+\input{Figures/TikzFigures/StandartFromFeedBack.tex}
+When working with the standard setup of a feedback loop the use of the Golden Formula can describe the output $C(s)$ depending on the input $R(s)$.
+\begin{equation}\label{eq:GoldenFormula}
+    C(s)=\frac{G(s)}{1\mp G(s)\cdot H(s)}\cdot R(s)
+\end{equation}
+The transfer function given by the Golden Formula, this is called the closed-loop transfer function, the product $G(s)\cdot H(s)$ is called the open-loop transfer-function, or loop-gain. $G(s)$ is the transfer function, while $H(s)$ is difference between input and output, which means that it is the feedback-gain.\\
+Transfer functions can be used to establish how various steady-state systems, e.g: "Step-response", "Impulses" or "Ramps", react to viable waveforms.
+\paragraph*{Controller design} \label{PID}
+There are one specific controller that is related to this project, the PID (Proportional, Integral, Derivative) controller. The PID controller is used to counteract the errors inside a loop. Each of these components drives the error towards zero, which can be read about in the sections to come. Every component has its own allocated gain, a gain can be described as the ratio between the output divided by the input. The objective in this system is to move from one angle to another, the error would then be the difference in angles over time. In this section \textbf{\textit{U}} is denoted as being the effort to be put in the system, which is the controllers amount of power needed to preform its task.\\
+
+\paragraph{Discrete time} In the real world we live in a continues time domain, but computers works in discrete time domain. The discrete time is not measured in seconds, but rather in time frames.\\
+The PID controller can ,in theory, find the perfect gains with the most suited rise time and settling time, but in practise this can be an expensive task. The expenses of the system can get high due to the need of a motor that is able to spin and stop at a rate that is suited for the PID controller, and sensors for the system needs to sense the changes within the system at the same rate.\\
+
+\begin{figure} [H]
+    \centering
+    \input{Figures/TikzFigures/PIDLAYout.tex}
+    %\includegraphics{Figures/Technical_figures/1-25.jpg}
+    \caption{Layout of a PID controllers response-equations to eliminate the error}
+    \label{fig:mPID}
+\end{figure}
+
+
+\begin{equation}\label{PID}
+    U=K_P\cdot\textit{e}+K_I\cdot\int\textit{e}+K_D\cdot\textit{e} \frac{d}{dt}
+\end{equation}
+
+\paragraph{The Proportional} gain $K_P$ in eq. \ref{PID} is the gain multiplied with the error(e) resulting in the effort.\\
+The larger the gain is, results in a faster rise time, the rise time is the time it takes for the response to get from 10\% to 90\% of the final angle. However this controller can only be used alone when the system can tolerate a constant error in steady state, a steady state error is an error over time that does not diminish. The proportional gain also has a tendency to overshoot the desired value if the gain is too high\cite{Control1DK}.\\
 
 \begin{figure}[H]
     \centering
-\input{Figures/TikzFigures/layOut/layOut.tex}
-    \caption{Wiring of the Teensy to external components}
-    \label{fig:motorSel}
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/PGAIN.png} 
+    %\input{Figures/TikzFigures/Pgain.tex}
+    \caption{If the gain $K_P$ is 1 then only the error has and effect on the effort}
+    \label{fig:pGain}
 \end{figure}
+
+\paragraph{The Integral} gain $K_I$ in eq. \ref{PID} of the controller, accumulates the error over time to output an effort to be put in the system. This means that it has a damping effect on the system. This Integral component can be used to minimise overshoot and eliminated the steady state error, that is in the p gain alone. The system accomplishes this at the cost of a slow rise time. Hereby being slower to reach its desired destination than with a P gain alone, but will reach there in time. As safety is important when working with people this system would be very suited. However as this is a slow system the precision should be weighed against speed\cite{Control1DK}. \\
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/IGAIN.png} 
+    %\input{Figures/TikzFigures/Igain.tex}
+    \caption{If the gain$K_I$ is 1 then only the sum of changes in the error has an effect on the effort.}
+    \label{fig:IGain}
+\end{figure}
+\paragraph{The derivative} gain $K_D$ in eq. \ref{PID} of the controller, works on the rate of change in the system. So if there are a fast change when the manipulator moves or get pushed it will have a larger output in the effort within the system, but when there is no change in the system, it has no effect. This can be useful when there is a need for fast reaction within the system, but in the case of a human with a robotic prosthesis if the $K_P$ gain is too high it can result in unforeseen consequences .\\ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/DGAIN.png} 
+   %\input{Figures/TikzFigures/Dgain.tex}
+    \caption{If the gain $K_D$ is 1 then only the rate of change in the error has and effect on the effort.}
+    \label{fig:DGain}
+\end{figure}
+
+
+\subsection*{Summery}
+This project fits the EMG sensors, with electrodes on a wired connection, and an IMU onto a measuring box. This box must be connected wirelessly with radio modules to the manipulator, and be operated with low power to ensure that electrocution is not possible. The data from the measuring unit must go into a micro-controller or a pc where it is processed, and a control scheme is created and sent to the robot manipulator. 
+\input{Figures/TikzFigures/DataflowNo.tex}
+
+\section{Delimitation's}\label{Delimitations}
+To design a complete prosthesis for a person with shoulder-disarticulation requires that there are money and time available to do so. Due to the lack of money and time in this project, a concept based prosthesis will be built upon the design of the CrustCrawler robotic manipulator from CrustCrawler robotics, the CrustCrawler is implemented with servos from Dynamixel. \\
+The controls for the prosthesis will be limited to two sEMG signals and three signals from an accelerometer, the number of signals from the user will limit the control design approach. All these components will be described in the next chapters.\\
+In order to save time, this project will not create a shoulder mounting and the placement of the robotic prosthesis is on a table, where the control system can still be created and tested.
+
+
+\section{Specific design solution}
+\subsection*{Equipment description}
+For this project several pieces of equipment have been provided, as such this project will investigate how these components can be used to accomplish our goal. The provided equipment can be read about in the following sections.
+
+
+\begin{table}[H]
+\begin{tabular}{|P{3cm}||P{10cm}|}
+
+\hline
+CrustCrawler & The manipulator consisting of 5 motors \\ \hline
+Motors                 & All five motors mounted on the CrustCrawler are made by Dynamixel.  \\ \hline
+Xbee S1                  & Wireless radio capable of pairing to matching device creating a connection between the two Xbee modules \\ \hline
+Teensy 3.5 Board              & Microcontroller that works as the on board computer.      \\ \hline
+Supply  board             & Power-supply board connected to a wall plug and the system                  \\ \hline
+\end{tabular}%
+\caption{Description and presentation of the CrustCrawler setup components}
+\label{tableCrust}
+\end{table}
+
+
 \begin{table}[H]
 \begin{tabular}{|P{3cm}||P{10cm}|}
 \hline
-\textbf{Measurement box} & This system consists of several components housed in a 3X printed box   \\ \hline
-XBee S1                  & Wireless radio capable of pairing to matching device creating a "cable" \\ \hline
-Battery                  & type CR123A, normally used for cameras                                  \\ \hline
+\textbf{Measuring box} & This system consists of several components housed in a 3D printed box   \\ \hline
+XBee S1                  & Wireless radio capable of pairing to matching device creating an "instant link" \\ \hline
+Battery                  & Type CR123A, normally used for cameras                                  \\ \hline
 5x Inputs                & 2 x Sparkfun EMG boards + 3 axis Accelerometer                         \\ \hline
 \end{tabular}%
-\caption{Description of components in the measurement box}
+\caption{Description of components in the measuring box}
 \label{tableBOX}
 \end{table}
-\section{Data flow}
-The figure below shows the data flow of the solution presented in this chapter. A single line in the arrow signifies that data is flowing one way and a double line means that information is both being sent and received.
+\noindent
+The figure \ref{fig:SpecificDesign} shows the data flow and the components of the solution presented in this chapter.
 \input{Figures/TikzFigures/DataFlow.tex}
-\subsection{Measuring unit}
-On the user, a grey measuring box is mounted. This box consists of two Sparkfun Muscle Sensor Platinum V3.3 EMG sensors, one Polulo 3-Axis Accelerometer, a battery and an XBee S1 radio module.
-\subsubsection{Sparkfun EMG sensors}
-The sensor measures raw EMG, however, this is not what is received by the rest of the system. First, the raw data is sent through a circuit that rectifies the raw EMG this means taking the root square of the input in order only to have positive data. After this, a small number of data points is then summed and averaged to smooth the data out in the smooth circuit. After the rectification and smoothing the data is sent to the XBee. A full schematic of the EMG sensors can be seen in Appendix \ref{app:EMGsensor}
-\subsubsection{Polulo Accelerometer}
-This is a simple 3-axis accelerometer providing further 3 channels of input into the measuring box. 
-\subsubsection{Wireless transition with Xbee}\label{XbeeExplan}
-The XBee S1 radio module is the foundation of the wireless transmission of data in this solution. It has a frequency of $100Hz$ and sends a frame on every sample which is created every $0.10s$ and the frame consists of 24 bytes. The structure of the 24 bytes can be seen below in figure \ref{fig:XbeeFrame}
+%\begin{figure}
+ %   \centering
+  %  \includegraphics[width=\textwidth]{Figures/Technical_figures/jk.PNG}
+   % \caption{Data flowchart}
+    %\label{fig:Dataflowchar}
+%\end{figure}
+\subsection*{Measuring box}
+This box consists of two Sparkfun Muscle Sensor Platinum V3.3 EMG sensors, one Polulo 3-Axis Accelerometer, a CR123A battery and an XBee S1 radio module, which can be read about below.
+
+\subsubsection*{EMG detection unit - Sparkfun EMG sensors}
+The EMG sensor measures the difference in potential within the muscles, however, this is not what is received by the rest of the system. First, the raw potential signal is sent through a circuit that rectifies the potential. After this, a small number of data points is then summed and averaged to smooth the data out in the smooth circuit. After the rectification and smoothing the data is sent to the XBee, which is described in depth in section \ref{sec:elHW}.\\
+A full schematic of the EMG sensors can be seen in Appendix \ref{app:EMGsensor}
+
+\subsubsection*{IMU - Polulo Accelerometer}
+The polulo accelerometer consists of both a gyroscope for direction sensing and an accelerometer for g-force detection. The g-force sensitivity of the polulo accelerometer goes up to 16 g's, although the g-force used in this project is around +/- 2g. Hereby it is concluded that both accelerometer and gyroscope is available, and only a small amount of g-force can decide the direction of choice \cite{Acceleration}.
+
+\subsubsection*{Radio module - Xbee S1}\label{XbeeExplan}
+The XBee S1 radio module is the foundation of the wireless transmission of data in this solution. It has a frequency of $100Hz$ and sends a frame on every sample which is created every $0.10s$, the frame consists of 24 bytes. The structure of the 24 bytes can be seen below in figure \ref{fig:XbeeFrame}
 \input{Figures/TikzFigures/XbeeFrame.tex}\label{XbeeDataStruct}
-The first is the header-byte, this determines the start of a new frame, after that there is the information on the length of the frame. This checks if all 24 bytes are in the frame. Afterwards, there is information on the XBee module followed by data gathered from the sensors and is ended by the CheckSum that checks if the data is transferred correctly.
-\subsection{Main Control PC}
-The Main Control PC (MCP) receive information from the measuring unit and the robot. The measuring unit data is converted into an output that is readable to the robot.
-\subsubsection{Dynamixel Protocol 2.0}
-The Dynamixel Servos is communicated with via the Dynamixel Protocol 2.0.
-The communication of the Dynamixelmotors on the robot arm has is a modular and daisy-chained system that supports data packet control. The packets consist of two parts. An instructional packet is sent to the motors, and a status packet is received from the motors. 
+The first is the header-byte that determines the start of a new frame, after the header-byte there is the length information of the frame that checks if all 24 bytes are in the frame. Afterwards, there is information on the XBee module followed by data gathered from the sensors and is ended by the CheckSum that checks if the data is transferred correctly.
+\subsection*{Microcontroller - Teensy 3.5}
+The small 62.4 mm x 18.0 mm teensy 3.5 micro-controller, has many features implemented, such as a 32-bit 120MHz processor capable of accessing several ADCs (Analog to digital converters). This feature is useful as it can convert analog voltage on a pin to a digital number. Furthermore these digital pins have interrupt capability and are 5 volt tolerant.\\
+The micro controller is build with a micro SD card slot which is capable of storing projects up to 512 kilobytes and a Electrically Erasable Programmable Read-Only-Memory(EEPROM), that can erase data by adding a electrical charge, much like a flash-memory, only that EEPROM keeps the data until the electric charge is added.\\
+The Teensy receives the information from the measuring box and the robot. The measuring unit data is converted into an output that is readable to the robot \cite{Teensy1}.
 
-\missingfigure{CAN BE SEEN HERE \label{fig:DynamixelStructure} \url{http://www.robotis.us/product_images/uploaded_images/dynamixel-03-2012.jpg}}
+\input{Sections/Technical_Analysis/Design/RS232RS485.tex}
 
-As seen in figure \ref{fig:DynamixelStructure} above is the data structure on the Dynamixel servos. A header determining the start off the packet and direction information, and a payload where most of the information is stored. 
-\paragraph{The instructional packet} has the basic structure seen the the figure bellow:
+\subsection*{Robot manipulator - CrustCrawler (Dynamixel servos)}\label{sec:DynProt}
+The CrustCrawler is designed with a modular design. This allows the different links and servos included in the CrustCrawler pro series to be configurable to the users desire and is compatible with AX, MX and RX motors. The CrustCrawler motors can be reached by RS-485 or 1mbs serial protocol, the RS-485 is described in the subsection above "RS232 to RS485"\\
+The communication between the Dynamixel servos included, is described in the subsection below "Dynamixel protocol 2.0".\\
+The CrustCrawler used in this project consist of one Dynamixel MX 106R SERVO, two Dynamixel MX 64R SERVO and two MX 28R Servos as seen in figure \ref{fig:CrustCrawlerSetup}.
+\begin{figure}[H]
+ \centering 
+    \includegraphics[width=10cm,height=7.5cm]{Figures/Technical_figures/diagram-20181210.png}
+    \caption{Picture of the CrustCrawler setup of group 362, with the names of the motors followed by arrows showing the location of said motor}
+    \label{fig:CrustCrawlerSetup}
+\end{figure}
+\subsubsection{Dynamixel Servo PID}
+In each Dynamixel servo there is an build in controller. The controller contains a feedback loop with an implemented PID controller with limiters to ensure that servos rotation-velocity do not exceed a lower or a higher threshold than expected\cite{PIDmxx}. The feedback loop and the PID controller can be customised to fit the purpose of a given task.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Figures/Technical_figures/PIDMX.PNG}
+    \caption{Internal PID controller in the Dynamixel servos\cite{PIDmxx}}
+    \label{fig:PIDMX}
+\end{figure}
+\noindent
+The servos positioning and velocity is analysed through the use of an encoder, placed on the gearing of the motor. 
+
+\subsubsection{Dynamixel protocol 2.0}\label{DynaProto2}
+The Dynamixel Servos communicates by the means of the Dynamixel Protocol 2.0.
+The communication of the Dynamixel servos, which the robot arm has, is a modular and daisy-chained system that supports data packet control. The packets consist of two parts. An instructional packet, which is sent to the motors, and a status packet that is received from the motors, as seen in figure \ref{fig:DynamixelStructure}. 
+
+
+\begin{figure}[H]
+ \centering
+\includegraphics[width=\textwidth]{Figures/Technical_figures/dynamixel-03-2012.jpg}
+ \caption{Illustration of sending and receiving  instruction and status packets with a daisy-chained modular design. \cite{DASIY}}
+ \label{fig:DynamixelStructure} 
+\end{figure}
+
+As seen in figure \ref{fig:Instructsctruct} below the data structure on the Dynamixel servos is defined. A header determining the start of the packet and direction information, and a payload, which is the data sent, where most of the information is stored. 
+\paragraph{The instructional packet} consists of the structure seen in the figure below:
 \input{Figures/TikzFigures/InstructPAcket.tex}
-First, the instructional packet has a header field, which indicates the start of the packet. Then there is a reserved slot with the value $0x00$, note that $0xFD$ cannot be used.  The Packet ID, refers to the ID of the device that receives and process the sent data. In the next field information on the packet length is provided and after this is the instruction field. In this field, the purpose of the packet is defined. A list of input can be seen in table \ref{tab:Instruct}.
+First, the instructional packet has a header field, which indicates the start of the packet. Then there is a reserved slot with the value $0x00$, note that $0xFD$ cannot be used.  The Packet ID, refers to the ID of the device that receives and process the sent data. In the next field information on the packet length is provided and after this is the instruction field. In this field, the purpose of the packet is defined.Hereafter the parameter fields is introduced, which contains help-data and are dependant on what instructions is in use. The last field contains the cycle redundancy check, which checks for errors in the data sent.  A list of further input can be seen in table \ref{tab:Instruct}.
 
 \begin{table}[H]
 \begin{tabular}{ | P{1.5cm} || P{2cm}|| P{9cm} |  }
  \hline
- \textbf{Value} & \textbf{Instruction} & \textbf{Describtion} \\
+ \textbf{Value} & \textbf{Instruction} & \textbf{Description} \\
  \hline
  $0x01$ & Ping & Instruction that checks whether the Packet has arrived to a device with the same ID as Packet ID\\\hline
  $0x02$ & Read & Instruction to read data from the Device\\\hline
@@ -85,17 +212,19 @@ $0x83$ & Sync Write & For multiple devices, Instruction to write data on the sam
  $0x92$ & Bulk Read & For multiple devices, Instruction to read data from different Addresses with different lengths at once\\\hline
   $0x93$ & Bulk Write & For multiple devices, Instruction to write data on different Addresses with different lengths at once\\\hline
 \end{tabular}
-\caption{Table of instructions Protocol 2.0}
+\caption{Table of instructions Protocol 2.0\cite{PIDmxx}}
     \label{tab:Instruct}
 \end{table}
-After the instruction field is the parameter fields. These are helpful data and are dependant on what instruction is in use. After the instruction field is the parameter fields. These are help-data and are dependant on what instruction is in use. Ultimately, is the 16 bit CRC which checks if the packet has been damaged and lost data.  
-\\
-\paragraph{The status packet} has the basic structure seen the the figure bellow:
+
+\paragraph{The status packet} consists of the structure seen in the the figure below:
 \input{Figures/TikzFigures/StatusPacket.tex}
-As you can see from the only difference from the structure of the instruction packet is the error field.
-This error field indicates the result of the instruction packet. The error field can be seen in the figure above. 
+\noindent
+As seen, the only difference of the status packet, compared with the instructional packet, is the error field.
+The error field indicates the result of the instruction packet. The error field can be seen in the figure below.\\ 
 \input{Figures/TikzFigures/ErrorStruckt.tex}
-In bit number 7, the alert changes the value from 0 to 1 if there is a failure on the device. 
+\noindent
+In bit number 7, the alert changes the value from 0 to 1 if there is a failure on the device.\\
+In table \ref{tab:StatusErrors}, different status errors can be seen.
 \begin{table}[H]
     \centering
     \begin{tabular}{|P{1.5cm}||P{2cm}||P{9cm}|}\hline
@@ -111,57 +240,9 @@ In bit number 7, the alert changes the value from 0 to 1 if there is a failure o
         Access Error&  Attempt to write a value in an Address that is Read Only or has not been defined OR  attempt to read a value in an Address that is Write Only or has not been defined OR attempt to write a value in the ROM domain while in a state of Torque Enable(ROM Lock)\\ \hline
     \end{tabular}
     \caption{Table of errors on the status packet}
-    \label{tab:Status Errors}
+    \label{tab:StatusErrors}
 \end{table}
 
 
-\paragraph{The Teensy microcontroller} is used as a data bridge between the MCP and the Dynamixel servos.
-\subsection{CrustCrawler}
-The robotic manipulator used in this project is a CrustCrawler arm consisting of one Dynamixel MX 106 SERVO, two Dynamixel MX 64 SERVO and two MX 28 Servos in the following setup:
-\missingfigure{Picture of robot}
-
-\section{Control Systems}
-%Intro:
-\input{Figures/TikzFigures/OpenClosedLoops.tex}
-As seen on the figure \ref{fig:openclose}, open loop, it manages to compute the reference signal and regulate it so that it is equal to the desired output. If a  disturbance were introduced to the open loop system, the system could not adjust for the disturbance and would produce an unrecognisable error.\\
-In the closed-loop system/feedback loop we can measure the output error and measure it towards the input and try to eliminate the error of disturbances to make the system linear, and easier to work with, but this is another section that will be covered in \ref{PID}.\\ 
-Utilising these control systems can be done by transfer functions. Transfer functions is the Laplace formulae of the control system design.\\
-
-\subsection{The Golden Formula}
-\input{Figures/TikzFigures/StandartFromFeedBack.tex}
-When working with the standard setup of a feedback loop the use of the Golden Formula can describe the output $C(s)$ depending on the input $R(s)$.
-\begin{equation}\label{eq:GoldenFormula}
-    C(s)=\frac{G(s)}{1\mp G(s)\cdot H(s)}\cdot R(s)
-\end{equation}
-The transfer function given by the Golden Formula, this is what is called the closed-loop transfer function, the product $G(s)\cdot H(s)$ is called the open-loop transfer-function, or loop-gain.
-
-
-
-\subsection{Signal analysis}
-When working with sinusoidal signals there are terms to describe the signal. Figure \ref{fig:StepRespGraf} illustrates some of these terms graphically on a step response signal.
-
-\begin{figure}[H]
- \centering 
-    \includegraphics[scale=0.8]{Figures/StepResponse1.jpg}
-    \caption{Figure with using step response signal, terms marked graphically in figure\cite{Risetime76:online}.}
-    \label{fig:StepRespGraf}
-\end{figure}
-
-\begin{itemize}
-    \item \textbf{Rise time} refers to the duration it takes for the step response y(t) from 10\% to 90\% of the final steady-state of the response\cite{Risetime76:online}.
-    
-    \item \textbf{Settling time} is the time it takes for y(t) reach and stay within the steady state, which is  +/- 2\% of $y_{final}$ (the steady state value)\cite{Risetime76:online}.
-   
-    \item \textbf{Percent overshoot} is the overshoot y(t) reaches relative to the steady state value $y_{final}$\cite{Risetime76:online}.
-
-    \item \textbf{Peak} is highest value y(t) reaches\cite{Risetime76:online}.
-
-    \item \textbf{Peak time} is the time it takes  for y(t) reach its first/maximum value\cite{Risetime76:online}. 
-    
-\end{itemize}
-\newpage
-\input{Sections/Technical_Analysis/Design/PID_con.tex}
-
-\input{Sections/Technical_Analysis/Design/Emg.tex}
 
 

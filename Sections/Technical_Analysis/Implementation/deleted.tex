@@ -44,3 +44,8 @@ Checksum=127\\
 \end{equation}
 When the package is received on the other end it is important to verify the checksum. This is done to ensure the package havent been corrupted during transit.
 This works on the principle that the sum of the API-package with the checksum added must be 256. if the result is anything else, then the transmission have been corrupted, and should be disregarded.
+
+RS232:
+
+This is use full when working in a noise environment as with the servos. When servos is producing an angular motion, they also produce an electromagnetic field that can induct noise into the the wires that transmit data. 
+The Rs 485 protocol can also handle multiple device, where the Rs 232 protocol is a point to point communication. A down side to the Rs 485 protocol is that there can only be one device communication at a time where as the RS 232 can transmit and receive at the same time\cite{RS232}.\\

@@ -1,16 +1,24 @@
-\chapter{Matematical Model}\label{ch:MatematicalModel}
-In this chapter different mathematical models of the crustcrawler, these will provide a foundation for the implementation section. These models will be used to describe the movement and dynamics.\\
-The crustcrawlers physical setup is as the following.
+\chapter{Mathematical Model}\label{ch:MatematicalModel}
+In this chapter different mathematical models of the CrustCrawler is introduced, which is by definition:\\\\
+\textit{\textbf{"a representation in mathematical terms of the behavior of real devices and objects"}}
+\\\\
+By equating these models a deeper understanding on the object is given.\\
+The CrustCrawler's physical setup is as the following.
 \begin{itemize}
-    \item distance from table to base plate 170mm
+    \item Distance from table to base plate 170mm
     \item Length L1 = 70mm  this is measured from the base plate to centre of shoulder 2.
     \item Length L2 = 210mm this is measured between centre of shoulder 2 and the elbow joints.
     \item Length L3 = 219mm this is measured from elbow joint to the middle of the end-effector.
-    \item Mass L1 = 
-    \item Mass L2 =
-    \item Mass L3 =
+    
+    \item Mass Link  L2 = 36.8g
+    \item Mass Link  L3 = 22.7g 
+    
+    
+    \item Mass Servo L1 = 135g
+    \item Mass Servo L2 = 153g
+    \item Mass Servo L3 = 135g
 \end{itemize}
 
-This physcial setup will influence the dynamics as well as the kinematics. A description in the form of Denavit Hartenberg is the appendix\ref{st:Denavit}.
+This physcial setup will influence the dynamics as well as the kinematics.
 \input{Sections/Technical_Analysis/Model/Kinematics.tex}
 \input{Sections/Technical_Analysis/Model/Eom.tex}
